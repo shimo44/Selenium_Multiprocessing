@@ -1,7 +1,7 @@
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 import time
-from multiprocessing import Pool
+from multiprocessing import Process
 
 
 def chrome_browser():
@@ -10,29 +10,23 @@ def chrome_browser():
 
     return driver
 
+def goto_perficient(driver):
+    driver.get("http://perficient.com")
 
-def mp_generate_browser(worker_count):
+
+def mp_worker(driver=chrome_browser()):
     start_time = time.time()
-    p = Pool()
 
-    worker = p.map(chrome_browser(), worker_count)
+    p = Process(goto_perficient(driver)).run()
 
-    p.close()
+    p.start()
     p.join()
+    # p.terminate()
 
     end_time = time.time() - start_time  # starts tracking runtime
 
     print(f"Generating the selenium driver browser took {end_time} time using multiprocessing.")
 
-    return worker
-
-
-def browse(driver, url):
-    driver.get(url)
-
 
 if __name__ ==  '__main__':
-    url = input("Enter URL to navigate to")
-    worker_count = 3
-    driver = mp_generate_browser(worker_count)
-    browse(driver, url)
+    mp_worker()
